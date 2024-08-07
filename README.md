@@ -1,7 +1,7 @@
 # Text-Mining-
 using web scrapping and doing a text mining
 Book Content Analyzer
-This Python script fetches book data from the Google Books API, allowing users to select a book, analyze its content, and visualize word frequencies. The script performs several key functions:
+<a href = "https://intellimindz.com/data-science-training-in-bangalore/">This Python script </a> fetches book data from the Google Books API, allowing users to select a book, analyze its content, and visualize word frequencies. The script performs several key functions:
 
 <br>Fetch Book Data:</br>
 
