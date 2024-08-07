@@ -1,0 +1,91 @@
+#CODE
+
+import requests
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+import re
+from collections import Counter
+
+# URL of the Google Books API endpoint
+url = 'https://www.googleapis.com/books/v1/volumes'
+
+
+# Get user input for search query and number of results
+search_query = input("Enter your search query: ")
+max_results = int(input("Enter the number of results to fetch: "))
+
+# Parameters for the API request
+params = {
+    'q': search_query,
+    'maxResults': max_results
+}
+
+# Send a GET request to the Google Books API
+response = requests.get(url, params=params)
+
+# Check if the request was successful
+if response.status_code == 200:
+    # Parse the JSON response
+    data = response.json()
+    
+    # Display book titles with indices for selection
+    for idx, item in enumerate(data.get('items', [])):
+        volume_info = item.get('volumeInfo', {})
+        title = volume_info.get('title', 'Title not available')
+        print(f"{idx+1}. {title}")
+
+    # Prompt user to choose a book by index
+    choice = int(input("Enter the index of the book to save its content: "))
+    selected_book = data['items'][choice - 1]  # Adjust index for 0-based indexing
+
+    # Extract content from the selected book
+    volume_info = selected_book.get('volumeInfo', {})
+    content = volume_info.get('description', 'No description available')
+    
+    # Save content to a text file
+    with open('selected_book_content.txt', 'w', encoding='utf-8') as file:
+        file.write(content)
+    
+    print('Content saved to "selected_book_content.txt" file.')
+
+    # hypothetical analysis (Precision, Recall, F-score)
+    # Example hypothetical values for Precision, Recall, F-score
+    true_positives = 90
+    false_positives = 10
+    false_negatives = 20
+
+    precision = true_positives / (true_positives + false_positives)
+    recall = true_positives / (true_positives + false_negatives)
+    f_score = 2 * (precision * recall) / (precision + recall)
+
+    print(f"\nPrecision: {precision:.2f}")
+    print(f"Recall: {recall:.2f}")
+    print(f"F-score: {f_score:.2f}")
+
+    # Generate Word Cloud from the Saved Text File
+    with open('selected_book_content.txt', 'r', encoding='utf-8') as file:
+        content = file.read()
+
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(content)
+
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    plt.show()
+
+    # Perform content mining (counting word frequencies)
+    words = re.findall(r'\b\w+\b', content.lower())  # Tokenize words and convert to lowercase
+    word_counts = Counter(words)  # Count occurrences of each word
+
+    # Print the most common words and their frequencies
+    print("\nTop 10 most common words:")
+    for word, count in word_counts.most_common(10):
+        print(f"{word}: {count}")
+
+    # Keyword searching
+    keyword = input("Enter a keyword to search in the content: ")
+    keyword_count = content.lower().count(keyword.lower())
+    print(f"Occurrences of '{keyword}' in the content: {keyword_count}")
+
+else:
+    print('Failed to fetch book data from Google Books API.')
